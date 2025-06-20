@@ -1,0 +1,10 @@
+[
+    {
+        "nombre": "Brisa",
+        "apellido": "Luna",
+        "edad": 15,
+        "matricula": "215487",
+        "sexo": "F",
+        "es_objeto": false
+    }
+]

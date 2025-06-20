@@ -1,0 +1,84 @@
+[
+    {
+        "nombre": "TICS",
+        "grado": "5",
+        "seccion": "A",
+        "maestro": {
+            "nombre": "Brisa",
+            "apellido": "Luna",
+            "edad": "20",
+            "matricula": 10001,
+            "especialidad": "programador"
+        },
+        "alumnos": [
+            {
+                "nombre": "Diana",
+                "apellido": "Ochoa",
+                "edad": 20,
+                "matricula": "23170155",
+                "sexo": "F",
+                "es_objeto": false
+            },
+            {
+                "nombre": "Daniela",
+                "apellido": "Luna",
+                "edad": 20,
+                "matricula": "23170133",
+                "sexo": "F",
+                "es_objeto": false
+            }
+        ]
+    },
+    {
+        "nombre": "Matematicas",
+        "grado": "5",
+        "seccion": "A",
+        "maestro": {
+            "nombre": "Ricardo",
+            "apellido": "Aguero",
+            "edad": "22",
+            "matricula": 10003,
+            "especialidad": "Ingeniero Matematico"
+        },
+        "alumnos": [
+            {
+                "nombre": "Paola",
+                "apellido": "altamirano",
+                "edad": 20,
+                "matricula": "23170184",
+                "sexo": "F",
+                "es_objeto": false
+            },
+            {
+                "nombre": "Daniela",
+                "apellido": "Luna",
+                "edad": 20,
+                "matricula": "23170131",
+                "sexo": "F",
+                "es_objeto": false
+            }
+        ]
+    },
+    {
+        "nombre": "Informatica",
+        "grado": "8",
+        "seccion": "A",
+        "maestro": {
+            "nombre": "Mario",
+            "apellido": "Lopez",
+            "edad": 45,
+            "matricula": "10004",
+            "especialidad": "Informatica"
+        },
+        "alumnos": [
+            {
+                "nombre": "Jose",
+                "apellido": "LODDS",
+                "edad": 19,
+                "matricula": "2315478",
+                "sexo": "M",
+                "es_objeto": false
+            }
+        ]
+    }
+]

@@ -1,0 +1,82 @@
+[
+    {
+        "nombre": "Brisa",
+        "apellido": "Luna",
+        "edad": "20",
+        "matricula": "10001",
+        "especialidad": "programador",
+        "es_objeto": false
+    },
+    {
+        "nombre": "Diana",
+        "apellido": "Ochoa",
+        "edad": 20,
+        "matricula": "10002",
+        "especialidad": "Sistemas",
+        "es_objeto": false
+    },
+    {
+        "nombre": "Juan",
+        "apellido": "Lopez",
+        "edad": 50,
+        "matricula": "10003",
+        "especialidad": "Informatica",
+        "es_objeto": false
+    },
+    {
+        "nombre": "Jose",
+        "apellido": "Martinez",
+        "edad": 54,
+        "matricula": "10004",
+        "especialidad": "Informatica",
+        "es_objeto": false
+    },
+    {
+        "nombre": "Mario",
+        "apellido": "Lopez",
+        "edad": 45,
+        "matricula": "10004",
+        "especialidad": "Informatica",
+        "es_objeto": false
+    },
+    {
+        "nombre": "Diana",
+        "apellido": "Ochoa",
+        "edad": 45,
+        "matricula": "M002",
+        "especialidad": "Ciencias",
+        "es_objeto": false
+    },
+    {
+        "nombre": "jesus ",
+        "apellido": "me la rosa",
+        "edad": 34,
+        "matricula": "123",
+        "especialidad": "db",
+        "es_objeto": false
+    },
+    {
+        "nombre": "AX",
+        "apellido": "SDF",
+        "edad": 90,
+        "matricula": "4567",
+        "especialidad": "FGHJ",
+        "es_objeto": false
+    },
+    {
+        "nombre": "Sebas",
+        "apellido": "asd",
+        "edad": 10,
+        "matricula": "123123",
+        "especialidad": "asdasd",
+        "es_objeto": false
+    },
+    {
+        "nombre": "Axel",
+        "apellido": "Espinoza",
+        "edad": 20,
+        "matricula": "12345",
+        "especialidad": "dfgahskd",
+        "es_objeto": false
+    }
+]
