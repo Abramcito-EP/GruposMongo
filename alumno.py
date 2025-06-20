@@ -1,10 +1,11 @@
 from arreglo import Arreglo
-import json
 
 class Alumno(Arreglo):
     def __init__(self, nombre=None, apellido=None, edad=None, matricula=None, sexo=None):
+        super().__init__()
+        self.collection_name = "alumnos"  # Definir el nombre de la colección
+        
         if nombre is None and apellido is None and edad is None and matricula is None and sexo is None:
-            super().__init__()
             self.es_objeto = True
         else:
             self.nombre = nombre

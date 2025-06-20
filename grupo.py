@@ -1,12 +1,13 @@
 from alumno import Alumno
 from maestro import Maestro
 from arreglo import Arreglo
-import json
 
 class Grupo(Arreglo):
     def __init__(self, nombre=None, grado=None, seccion=None, maestro=None, alumnos=None):
+        super().__init__()
+        self.collection_name = "grupos"  # Definir el nombre de la colección
+        
         if nombre is None:
-            super().__init__()
             self.es_objeto = True
             return
 
@@ -15,19 +16,20 @@ class Grupo(Arreglo):
         self.seccion = seccion
 
         if isinstance(maestro, dict):
-            maestro = {k: v for k, v in maestro.items() if k in ["nombre", "apellido", "edad", "matricula", "especialidad"]}
             self.maestro = Maestro(**maestro)
         else:
-            self.maestro = maestro if isinstance(maestro, Maestro) else None
+            self.maestro = maestro
 
         self.alumnos = Alumno()
         if alumnos:
-            for alumno_data in alumnos:
-                if isinstance(alumno_data, dict):
-                    alumno_data = {k: v for k, v in alumno_data.items() if k in ["nombre", "apellido", "edad", "matricula", "sexo"]}
-                    self.alumnos.agregar(Alumno(**alumno_data))
-                elif isinstance(alumno_data, Alumno):
-                    self.alumnos.agregar(alumno_data)
+            if isinstance(alumnos, list):
+                for alumno in alumnos:
+                    if isinstance(alumno, dict):
+                        self.alumnos.agregar(Alumno(**alumno))
+                    else:
+                        self.alumnos.agregar(alumno)
+            else:
+                self.alumnos = alumnos
 
         self.es_objeto = False
 
@@ -37,26 +39,54 @@ class Grupo(Arreglo):
 
     def convertir_diccionario(self):
         if self.es_objeto:
-            return [item.convertir_diccionario() for item in self.items]
-
+            return super().convertir_diccionario()
+        
+        # Convertir alumnos a lista de diccionarios
+        alumnos_dict = []
+        if hasattr(self.alumnos, 'items'):
+            for alumno in self.alumnos.items:
+                if hasattr(alumno, 'convertir_diccionario'):
+                    alumnos_dict.append(alumno.convertir_diccionario())
+        
+        # Convertir maestro a diccionario
+        maestro_dict = {}
+        if hasattr(self.maestro, 'convertir_diccionario'):
+            maestro_dict = self.maestro.convertir_diccionario()
+        
         return {
             "nombre": self.nombre,
             "grado": self.grado,
             "seccion": self.seccion,
-            "maestro": self.maestro.convertir_diccionario() if self.maestro else None,
-            "alumnos": self.alumnos.convertir_diccionario()
+            "maestro": maestro_dict,
+            "alumnos": alumnos_dict
         }
 
     def __str__(self):
         if self.es_objeto:
-            return f"Total de grupos: {len(self.items)}"
-        maestro_nombre = f"{self.maestro.nombre} {self.maestro.apellido}" if self.maestro else "Sin asignar"
-        return f"Grupo: {self.nombre}, Grado: {self.grado}, Sección: {self.seccion}, Maestro: {maestro_nombre}, Alumnos: {len(self.alumnos.items)}"
+            return f"Total de grupos: {super().__str__()}"
+        
+        alumnos_count = len(self.alumnos.items) if hasattr(self.alumnos, 'items') else 0
+        maestro_info = f"{self.maestro.nombre} {self.maestro.apellido}" if hasattr(self.maestro, 'nombre') else "Sin asignar"
+        
+        return (f"Grupo: {self.nombre}, Grado: {self.grado}, Sección: {self.seccion}, "
+                f"Maestro: {maestro_info}, Alumnos: {alumnos_count}")
 
     def mostrar(self):
-        print(self)
-        print("Alumnos:")
-        self.alumnos.mostrar()
+        print(str(self))
+        if not self.es_objeto:
+            print("\nInformación del maestro:")
+            if hasattr(self.maestro, 'mostrar'):
+                self.maestro.mostrar()
+            else:
+                print("Sin maestro asignado")
+            
+            print("\nLista de alumnos:")
+            if hasattr(self.alumnos, 'items') and self.alumnos.items:
+                for alumno in self.alumnos.items:
+                    if hasattr(alumno, 'mostrar'):
+                        alumno.mostrar()
+            else:
+                print("No hay alumnos en este grupo")
 
 
 if __name__ == "__main__":
