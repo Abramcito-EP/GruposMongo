@@ -92,11 +92,6 @@ class Grupo(Arreglo):
 if __name__ == "__main__":
     from GrupoUI import GrupoUI
 
-    grupos = Grupo()
-    maestro = Maestro("Pedro", "Gómez", 42, "M001", "Historia")
-    alumno = Alumno("Lucía", "Martínez", 13, "A001", "F")
-    grupo_individual = Grupo("Grupo C", "1ro", "A", maestro, [alumno])
-    grupos.agregar(grupo_individual)
 
-    interfaz = GrupoUI(grupos)
+    interfaz = GrupoUI()
     interfaz.menu()

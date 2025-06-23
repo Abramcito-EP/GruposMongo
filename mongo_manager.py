@@ -46,6 +46,7 @@ class MongoManager:
                 return False
             
             # Intentar conexión a MongoDB
+            print("Intentando conectar a MongoDB...")
             self.client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
             # Verificar conexión
             self.client.admin.command('ping')
@@ -55,6 +56,11 @@ class MongoManager:
             return True
         except (ConnectionFailure, ServerSelectionTimeoutError) as e:
             print(f"Error de conexión a MongoDB: {e}")
+            self.is_connected = False
+            return False
+        except Exception as e:
+            print(f"Error inesperado al conectar a MongoDB: {e}")
+            print("Trabajando en modo offline.")
             self.is_connected = False
             return False
     
