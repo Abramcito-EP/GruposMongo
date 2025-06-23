@@ -2,7 +2,7 @@ from pymongo import MongoClient
 import sys
 
 # URL de conexión
-mongo_uri = "mongodb+srv://admin:123456@cluster0.3muovte.mongodb.net/?retryWrites=true&w=majority"
+mongo_uri = "mongodb+srv://admin:admin123@cluster0.3muovte.mongodb.net/?retryWrites=true&w=majority"
 
 try:
     # Intentar conexión
