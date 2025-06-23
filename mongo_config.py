@@ -1,7 +1,7 @@
 # Configuración para MongoDB
 
 # URL de conexión a MongoDB Atlas
-MONGO_URI = "mongodb+srv://Axel:1q2w3e4r@cluster0.3muovte.mongodb.net/"
+MONGO_URI = "mongodb+srv://admin:admin123@cluster0.3muovte.mongodb.net/?retryWrites=true&w=majority"
 
 # Nombre de la base de datos
 DB_NAME = "Escuela"

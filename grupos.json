@@ -1,83 +1,106 @@
 [
     {
-        "nombre": "TICS",
-        "grado": "5",
+        "nombre": "Grupo1",
+        "grado": "3",
         "seccion": "A",
         "maestro": {
-            "nombre": "Brisa",
-            "apellido": "Luna",
-            "edad": "20",
-            "matricula": 10001,
-            "especialidad": "programador"
-        },
-        "alumnos": [
-            {
-                "nombre": "Diana",
-                "apellido": "Ochoa",
-                "edad": 20,
-                "matricula": "23170155",
-                "sexo": "F",
-                "es_objeto": false
-            },
-            {
-                "nombre": "Daniela",
-                "apellido": "Luna",
-                "edad": 20,
-                "matricula": "23170133",
-                "sexo": "F",
-                "es_objeto": false
-            }
-        ]
-    },
-    {
-        "nombre": "Matematicas",
-        "grado": "5",
-        "seccion": "A",
-        "maestro": {
-            "nombre": "Ricardo",
+            "nombre": "Kikardo",
             "apellido": "Aguero",
-            "edad": "22",
-            "matricula": 10003,
-            "especialidad": "Ingeniero Matematico"
+            "edad": 23,
+            "matricula": "2345678",
+            "especialidad": "Maistro"
         },
         "alumnos": [
             {
-                "nombre": "Paola",
-                "apellido": "altamirano",
-                "edad": 20,
-                "matricula": "23170184",
-                "sexo": "F",
-                "es_objeto": false
+                "nombre": "Abraham",
+                "apellido": "Echavarría",
+                "edad": 19,
+                "matricula": "23170110",
+                "sexo": "M"
             },
             {
-                "nombre": "Daniela",
-                "apellido": "Luna",
+                "nombre": "Abraham",
+                "apellido": "Echavarría",
+                "edad": 19,
+                "matricula": "23170110",
+                "sexo": "M"
+            },
+            {
+                "nombre": "Axel",
+                "apellido": "Espinoza",
                 "edad": 20,
-                "matricula": "23170131",
-                "sexo": "F",
-                "es_objeto": false
+                "matricula": "23170109",
+                "sexo": "M"
+            },
+            {
+                "nombre": "Kevin",
+                "apellido": "Gonzalez",
+                "edad": 21,
+                "matricula": "23170187",
+                "sexo": "M"
             }
         ]
     },
     {
-        "nombre": "Informatica",
-        "grado": "8",
-        "seccion": "A",
+        "nombre": "Grupo2",
+        "grado": "5",
+        "seccion": "a",
         "maestro": {
-            "nombre": "Mario",
-            "apellido": "Lopez",
-            "edad": 45,
-            "matricula": "10004",
-            "especialidad": "Informatica"
+            "nombre": "Saúl",
+            "apellido": "Sánchez",
+            "edad": 20,
+            "matricula": "234567",
+            "especialidad": "dfghj"
         },
         "alumnos": [
             {
-                "nombre": "Jose",
-                "apellido": "LODDS",
+                "nombre": "Abraham",
+                "apellido": "Echavarría",
                 "edad": 19,
-                "matricula": "2315478",
-                "sexo": "M",
-                "es_objeto": false
+                "matricula": "23170110",
+                "sexo": "M"
+            },
+            {
+                "nombre": "Abraham",
+                "apellido": "Echavarría",
+                "edad": 19,
+                "matricula": "23170110",
+                "sexo": "M"
+            },
+            {
+                "nombre": "Axel",
+                "apellido": "Espinoza",
+                "edad": 20,
+                "matricula": "23170109",
+                "sexo": "M"
+            },
+            {
+                "nombre": "Kevin",
+                "apellido": "Gonzalez",
+                "edad": 21,
+                "matricula": "23170187",
+                "sexo": "M"
+            }
+        ]
+    },
+    {
+        "nombre": "Grupo3",
+        "grado": "5",
+        "seccion": "A",
+        "maestro": {
+            "nombre": "Kevin",
+            "apellido": "Gonzalez",
+            "edad": 21,
+            "matricula": "23170189",
+            "especialidad": "Programador"
+        },
+        "alumnos": [
+            {
+                "nombre": "Abraham",
+                "apellido": "Echavarría",
+                "edad": 19,
+                "matricula": "23170110",
+                "sexo": "M"
             }
         ]
     }

@@ -4,9 +4,14 @@ class Alumno(Arreglo):
     def __init__(self, nombre=None, apellido=None, edad=None, matricula=None, sexo=None):
         super().__init__()
         self.collection_name = "alumnos"  # Definir el nombre de la colección
+        self.archivo_json = "alumnos.json"  # Archivo JSON por defecto
         
         if nombre is None and apellido is None and edad is None and matricula is None and sexo is None:
             self.es_objeto = True
+            # Cargar automáticamente del archivo JSON si existe, 
+            # pero solo si este es el objeto principal, no un contenedor
+            if self.archivo_json and not hasattr(self, '_skip_load'):
+                self.cargarArchivo(self.archivo_json, Alumno)
         else:
             self.nombre = nombre
             self.apellido = apellido
@@ -38,9 +43,7 @@ class Alumno(Arreglo):
 if __name__ == "__main__":
     from AlumnoUI import AlumnoUI
 
+    # Crear una instancia de Alumno que cargará automáticamente del JSON
     alumnos = Alumno()
-    alumnos.agregar(Alumno("Lucas", "Pérez", 22, "12345", "M"))
-    alumnos.agregar(Alumno("Diana", "López", 20, "67890", "F"))
-
-    interfaz = AlumnoUI(alumnos)
+    interfaz = AlumnoUI(alumnos, 'alumnos.json')
     interfaz.menu()

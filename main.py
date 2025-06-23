@@ -1,4 +1,3 @@
-import json
 from AlumnoUI import AlumnoUI
 from MaestroUI import MaestroUI
 from GrupoUI import GrupoUI
@@ -6,14 +5,22 @@ from alumno import Alumno
 from maestro import Maestro
 from grupo import Grupo
 from mongo_manager import MongoManager
+import json
+import os
 
 def main():
     # Inicializar el administrador de MongoDB (esto inicia la sincronización automática)
     mongo_manager = MongoManager()
     
+    # Crear archivos JSON si no existen
+    for archivo in ['alumnos.json', 'maestros.json', 'grupos.json']:
+        if not os.path.exists(archivo):
+            with open(archivo, 'w', encoding='utf-8') as f:
+                json.dump([], f)
+    
     # Mostrar estado de conexión
     if mongo_manager.is_connected:
-        print("Conectado a MongoDB. Los datos se guardarán en la nube.")
+        print("Conectado a MongoDB. Los datos se guardarán en la nube y localmente.")
     else:
         print("Trabajando en modo offline. Los datos se guardarán localmente.")
     
@@ -29,17 +36,17 @@ def main():
         opcion = input("Seleccione una opción: ")
         
         if opcion == "1":
-            # Cargar alumnos
+            # Crear objetos que cargarán automáticamente desde JSON
             alumnos = Alumno()
             interfaz = AlumnoUI(alumnos, "alumnos.json")
             interfaz.menu()
         elif opcion == "2":
-            # Cargar maestros
+            # Crear objetos que cargarán automáticamente desde JSON
             maestros = Maestro()
             interfaz = MaestroUI(maestros, "maestros.json")
             interfaz.menu()
         elif opcion == "3":
-            # Cargar grupos
+            # Crear objetos que cargarán automáticamente desde JSON
             grupos = Grupo()
             interfaz = GrupoUI(grupos, "grupos.json")
             interfaz.menu()
@@ -53,7 +60,7 @@ def main():
         elif opcion == "5":
             # Ver estado de conexión
             if mongo_manager.is_connected:
-                print("Conectado a MongoDB. Los datos se guardan directamente en la nube.")
+                print("Conectado a MongoDB. Los datos se guardan en la nube y localmente.")
             else:
                 print("Trabajando en modo offline. Los datos se guardan localmente.")
                 print("Se intentará sincronizar automáticamente cada 20 segundos.")

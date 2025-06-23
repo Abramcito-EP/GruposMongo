@@ -6,9 +6,12 @@ class Grupo(Arreglo):
     def __init__(self, nombre=None, grado=None, seccion=None, maestro=None, alumnos=None):
         super().__init__()
         self.collection_name = "grupos"  # Definir el nombre de la colección
+        self.archivo_json = "grupos.json"  # Archivo JSON por defecto
         
         if nombre is None:
             self.es_objeto = True
+            if self.archivo_json:
+                self.cargarArchivo(self.archivo_json, Grupo)
             return
 
         self.nombre = nombre
@@ -20,7 +23,12 @@ class Grupo(Arreglo):
         else:
             self.maestro = maestro
 
+        # Inicializar alumnos como un objeto Alumno vacío
         self.alumnos = Alumno()
+        self.alumnos.es_objeto = True
+        self.alumnos.items = []  # Iniciar con lista vacía
+        
+        # Solo agregar alumnos si se proporcionan explícitamente
         if alumnos:
             if isinstance(alumnos, list):
                 for alumno in alumnos:
@@ -28,13 +36,17 @@ class Grupo(Arreglo):
                         self.alumnos.agregar(Alumno(**alumno))
                     else:
                         self.alumnos.agregar(alumno)
-            else:
-                self.alumnos = alumnos
+            elif hasattr(alumnos, 'items'):
+                for alumno in alumnos.items:
+                    self.alumnos.agregar(alumno)
 
         self.es_objeto = False
 
     def asignarMaestro(self, maestro):
         self.maestro = maestro
+        # Guardar cambios automáticamente
+        if self.archivo_json:
+            self.guardarArchivo(self.archivo_json)
         return f"El maestro {maestro.nombre} {maestro.apellido} ha sido asignado al grupo {self.nombre}."
 
     def convertir_diccionario(self):
@@ -88,10 +100,55 @@ class Grupo(Arreglo):
             else:
                 print("No hay alumnos en este grupo")
 
+    def cargarDatos(self, datos, clase_objeto):
+        self.items = []
+
+        if isinstance(datos, list):
+            for item in datos:
+                try:
+                    # Primero, procesar los alumnos si existen
+                    alumnos_list = []
+                    if "alumnos" in item and isinstance(item["alumnos"], list):
+                        for alumno_data in item["alumnos"]:
+                            # Filtrar campos no relevantes
+                            alumno_data = {k: v for k, v in alumno_data.items() 
+                                           if k != "_id" and k != "es_objeto"}
+                            alumnos_list.append(Alumno(**alumno_data))
+                    
+                    # Procesar al maestro si existe
+                    maestro = None
+                    if "maestro" in item and isinstance(item["maestro"], dict):
+                        maestro_data = {k: v for k, v in item["maestro"].items() 
+                                       if k != "_id" and k != "es_objeto"}
+                        maestro = Maestro(**maestro_data)
+                    
+                    # Eliminar alumnos y maestro del diccionario
+                    grupo_data = {k: v for k, v in item.items() 
+                                 if k != "alumnos" and k != "maestro" and k != "_id" and k != "es_objeto"}
+                    
+                    # Crear el grupo
+                    grupo = Grupo(**grupo_data)
+                    
+                    # Asignar maestro y alumnos
+                    if maestro:
+                        grupo.maestro = maestro
+                    
+                    grupo.alumnos = Alumno()
+                    grupo.alumnos.items = []
+                    for alumno in alumnos_list:
+                        grupo.alumnos.agregar(alumno)
+                    
+                    self.items.append(grupo)
+                except Exception as e:
+                    print(f"Error al cargar grupo: {e}")
+        else:
+            super().cargarDatos(datos, clase_objeto)
+
 
 if __name__ == "__main__":
     from GrupoUI import GrupoUI
 
-
-    interfaz = GrupoUI()
+    # Crear una instancia de Grupo que cargará automáticamente del JSON
+    grupos = Grupo()
+    interfaz = GrupoUI(grupos, 'grupos.json')
     interfaz.menu()

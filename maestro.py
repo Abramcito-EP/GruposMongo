@@ -5,9 +5,13 @@ class Maestro(Arreglo):
     def __init__(self, nombre=None, apellido=None, edad=None, matricula=None, especialidad=None):
         super().__init__()
         self.collection_name = "maestros"  # Definir el nombre de la colección
+        self.archivo_json = "maestros.json"  # Archivo JSON por defecto
         
         if nombre is None and apellido is None and edad is None and matricula is None and especialidad is None:
             self.es_objeto = True
+            # Cargar automáticamente del archivo JSON si existe
+            if self.archivo_json:
+                self.cargarArchivo(self.archivo_json, Maestro)
         else:
             self.nombre = nombre
             self.apellido = apellido
@@ -39,5 +43,7 @@ class Maestro(Arreglo):
 if __name__ == "__main__":
     from MaestroUI import MaestroUI
 
-    interfaz = MaestroUI()
+    # Crear una instancia de Maestro que cargará automáticamente del JSON
+    maestros = Maestro()
+    interfaz = MaestroUI(maestros, 'maestros.json')
     interfaz.menu()

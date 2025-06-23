@@ -54,13 +54,8 @@ class MongoManager:
             self.is_connected = True
             print("Conexión a MongoDB establecida correctamente.")
             return True
-        except (ConnectionFailure, ServerSelectionTimeoutError) as e:
-            print(f"Error de conexión a MongoDB: {e}")
-            self.is_connected = False
-            return False
         except Exception as e:
-            print(f"Error inesperado al conectar a MongoDB: {e}")
-            print("Trabajando en modo offline.")
+            print(f"Error al conectar a MongoDB: {e}")
             self.is_connected = False
             return False
     
@@ -122,7 +117,14 @@ class MongoManager:
         try:
             # Leer datos pendientes
             with open(backup_file, 'r', encoding='utf-8') as f:
-                pending_data = json.load(f)
+                try:
+                    pending_data = json.load(f)
+                except json.JSONDecodeError:
+                    print(f"Archivo corrupto {backup_file}, creando nuevo")
+                    pending_data = []
+                    with open(backup_file, 'w', encoding='utf-8') as f2:
+                        json.dump([], f2)
+                    return True
             
             if not pending_data:
                 return True  # No hay datos pendientes
@@ -140,9 +142,16 @@ class MongoManager:
                 collection.insert_many(pending_data)
                 print(f"Se enviaron {len(pending_data)} documentos a la colección {collection_name}")
             
-            # Limpiar archivo de respaldo
-            with open(backup_file, 'w', encoding='utf-8') as f:
+            # Limpiar archivo de respaldo usando archivo temporal
+            temp_file = f"{backup_file}.tmp"
+            with open(temp_file, 'w', encoding='utf-8') as f:
                 json.dump([], f)
+            
+            # Si la escritura fue exitosa, reemplazar el archivo original
+            if os.path.exists(temp_file):
+                if os.path.exists(backup_file):
+                    os.remove(backup_file)
+                os.rename(temp_file, backup_file)
             
             print(f"Datos de {collection_name} sincronizados correctamente.")
             return True
@@ -173,30 +182,47 @@ class MongoManager:
             return False
     
     def _save_to_backup(self, collection_name, document):
-        """Guarda un documento en el archivo de respaldo correspondiente."""
+        """Guarda un documento en el archivo de respaldo correspondiente de forma segura."""
         backup_file = BACKUP_FILES[collection_name]
+        temp_file = f"{backup_file}.tmp"
+        
         try:
+            # Eliminar campo _id si existe (puede causar problemas)
+            if '_id' in document:
+                document = {k: v for k, v in document.items() if k != '_id'}
+            
             # Leer datos existentes
+            pending_data = []
             if os.path.exists(backup_file):
-                with open(backup_file, 'r', encoding='utf-8') as f:
-                    try:
-                        pending_data = json.load(f)
-                    except json.JSONDecodeError:
-                        pending_data = []
-            else:
-                pending_data = []
+                try:
+                    with open(backup_file, 'r', encoding='utf-8') as f:
+                        try:
+                            pending_data = json.load(f)
+                        except json.JSONDecodeError:
+                            print(f"Archivo corrupto {backup_file}, creando nuevo")
+                            pending_data = []
+                except Exception as e:
+                    print(f"Error al leer archivo de respaldo: {e}")
             
             # Agregar nuevo documento
             pending_data.append(document)
             
-            # Guardar archivo actualizado
-            with open(backup_file, 'w', encoding='utf-8') as f:
+            # Guardar primero en archivo temporal
+            with open(temp_file, 'w', encoding='utf-8') as f:
                 json.dump(pending_data, f, indent=4, ensure_ascii=False)
             
+            # Si la escritura fue exitosa, reemplazar el archivo original
+            if os.path.exists(temp_file):
+                if os.path.exists(backup_file):
+                    os.remove(backup_file)
+                os.rename(temp_file, backup_file)
+                
             print(f"Documento guardado en archivo de respaldo {backup_file}")
             return True
         except Exception as e:
             print(f"Error al guardar en archivo de respaldo: {e}")
+            if os.path.exists(temp_file):
+                os.remove(temp_file)
             return False
     
     def find_documents(self, collection_name, query=None):
@@ -226,20 +252,26 @@ class MongoManager:
         if os.path.exists(regular_file):
             try:
                 with open(regular_file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                documents.extend(data)
-            except:
-                pass
+                    try:
+                        data = json.load(f)
+                        documents.extend(data)
+                    except json.JSONDecodeError:
+                        print(f"Archivo corrupto {regular_file}")
+            except Exception as e:
+                print(f"Error al leer archivo {regular_file}: {e}")
         
         # Luego buscar en archivos de respaldo
         backup_file = BACKUP_FILES[collection_name]
         if os.path.exists(backup_file):
             try:
                 with open(backup_file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                documents.extend(data)
-            except:
-                pass
+                    try:
+                        data = json.load(f)
+                        documents.extend(data)
+                    except json.JSONDecodeError:
+                        print(f"Archivo corrupto {backup_file}")
+            except Exception as e:
+                print(f"Error al leer archivo de respaldo {backup_file}: {e}")
         
         # Filtrar por query si es necesario
         if query is not None:

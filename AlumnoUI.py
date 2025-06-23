@@ -3,25 +3,27 @@ import os
 import json
 
 class AlumnoUI:
-    def _init_(self, alumnos=None, archivo='alumnos.json'):
+    def __init__(self, alumnos=None, archivo='alumnos.json'):
         self.archivo = archivo 
-        self.guardar = False    
+        self.guardar = True  # Siempre guardar cambios   
+        
         if alumnos is not None:
             if isinstance(alumnos, Alumno):
                 self.alumnos = alumnos
+                # Asegurar que el objeto tiene referencia al archivo
+                self.alumnos.archivo_json = archivo
             else:
                 self.alumnos = Alumno()
                 for alumno in alumnos:
                     self.alumnos.agregar(alumno)
-            print("Usando clase alumno.")
-        elif archivo and os.path.exists(archivo):
-            print(f"Cargando alumnos desde archivo '{archivo}'.")
-            self.alumnos = Alumno()
-            self.alumnos.cargarArchivo(archivo, Alumno)
-            self.guardar = True
+                # Guardar inmediatamente
+                self.alumnos.guardarArchivo(archivo)
+            print("Usando clase alumno proporcionada.")
         else:
-            print("No se proporcionó archivo ni objeto con datos. Creando lista vacía.")
+            print(f"Inicializando con archivo '{archivo}'.")
             self.alumnos = Alumno()
+            # El método cargarArchivo actualizará archivo_json
+            self.alumnos.cargarArchivo(archivo, Alumno)
 
     def menu(self):
         while True:
@@ -42,6 +44,7 @@ class AlumnoUI:
             elif opcion == "4":
                 self.actualizar_alumno()
             elif opcion == "5":
+                # Asegurar que los datos estén guardados antes de salir
                 if self.guardar:
                     self.alumnos.guardarArchivo(self.archivo)
                 break
@@ -49,6 +52,9 @@ class AlumnoUI:
                 print("Opción inválida.")
 
     def mostrar_alumnos(self):
+        # Recargar desde el archivo para mostrar datos actualizados
+        self.alumnos.cargarArchivo(self.archivo, Alumno)
+        
         if not self.alumnos.items:
             print("No hay alumnos registrados.")
             return
@@ -60,18 +66,18 @@ class AlumnoUI:
     def agregar_alumno(self):
         nombre = input("Nombre: ")
         apellido = input("Apellido: ")
-        edad = int(input("Edad: "))
+        try:
+            edad = int(input("Edad: "))
+        except ValueError:
+            print("Edad inválida, se usará 0")
+            edad = 0
         matricula = input("Matrícula: ")
         sexo = input("Sexo (M/F): ")
         alumno = Alumno(nombre, apellido, edad, matricula, sexo)
 
         self.alumnos.agregar(alumno)
-
-        if self.guardar:
-            self.alumnos.guardarArchivo(self.archivo)
-            print("Alumno agregado y guardado en archivo.")
-        else:
-            print("Alumno agregado (modo objeto).")
+        # La clase base guardará automáticamente si tiene archivo_json
+        print("Alumno agregado y guardado.")
 
     def eliminar_alumno(self):
         try:
@@ -82,8 +88,7 @@ class AlumnoUI:
             self.mostrar_alumnos()
             indice = int(input("Índice del alumno a eliminar: "))
             if self.alumnos.eliminar(indice=indice):
-                if self.guardar:
-                    self.alumnos.guardarArchivo(self.archivo)
+                # La clase base guardará automáticamente
                 print("Alumno eliminado.")
             else:
                 print("No se pudo eliminar el alumno.")
@@ -115,8 +120,8 @@ class AlumnoUI:
                 alumno.matricula = matricula
                 alumno.sexo = sexo
                 
-                if self.guardar:
-                    self.alumnos.guardarArchivo(self.archivo)
+                # Guardar cambios
+                self.alumnos.guardarArchivo(self.archivo)
                 print("Alumno actualizado.")
             else:
                 print("Índice fuera de rango.")

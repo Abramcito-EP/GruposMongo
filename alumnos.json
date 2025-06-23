@@ -1,10 +1,9 @@
 [
     {
-        "nombre": "Brisa",
-        "apellido": "Luna",
-        "edad": 15,
-        "matricula": "215487",
-        "sexo": "F",
-        "es_objeto": false
+        "nombre": "Abraham",
+        "apellido": "Echavarría",
+        "edad": 19,
+        "matricula": "23170110",
+        "sexo": "M"
     }
 ]
