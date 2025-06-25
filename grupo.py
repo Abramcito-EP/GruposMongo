@@ -5,8 +5,8 @@ from arreglo import Arreglo
 class Grupo(Arreglo):
     def __init__(self, nombre=None, grado=None, seccion=None, maestro=None, alumnos=None):
         super().__init__()
-        self.collection_name = "grupos"  # Definir el nombre de la colección
-        self.archivo_json = "grupos.json"  # Archivo JSON por defecto
+        self.collection_name = "grupos" 
+        self.archivo_json = "grupos.json"  
         
         if nombre is None:
             self.es_objeto = True
@@ -23,12 +23,12 @@ class Grupo(Arreglo):
         else:
             self.maestro = maestro
 
-        # Inicializar alumnos como un objeto Alumno vacío
+
         self.alumnos = Alumno()
         self.alumnos.es_objeto = True
-        self.alumnos.items = []  # Iniciar con lista vacía
+        self.alumnos.items = [] 
         
-        # Solo agregar alumnos si se proporcionan explícitamente
+
         if alumnos:
             if isinstance(alumnos, list):
                 for alumno in alumnos:
@@ -44,7 +44,6 @@ class Grupo(Arreglo):
 
     def asignarMaestro(self, maestro):
         self.maestro = maestro
-        # Guardar cambios automáticamente
         if self.archivo_json:
             self.guardarArchivo(self.archivo_json)
         return f"El maestro {maestro.nombre} {maestro.apellido} ha sido asignado al grupo {self.nombre}."
@@ -53,14 +52,12 @@ class Grupo(Arreglo):
         if self.es_objeto:
             return super().convertir_diccionario()
         
-        # Convertir alumnos a lista de diccionarios
         alumnos_dict = []
         if hasattr(self.alumnos, 'items'):
             for alumno in self.alumnos.items:
                 if hasattr(alumno, 'convertir_diccionario'):
                     alumnos_dict.append(alumno.convertir_diccionario())
         
-        # Convertir maestro a diccionario
         maestro_dict = {}
         if hasattr(self.maestro, 'convertir_diccionario'):
             maestro_dict = self.maestro.convertir_diccionario()
@@ -106,30 +103,28 @@ class Grupo(Arreglo):
         if isinstance(datos, list):
             for item in datos:
                 try:
-                    # Primero, procesar los alumnos si existen
+
                     alumnos_list = []
                     if "alumnos" in item and isinstance(item["alumnos"], list):
                         for alumno_data in item["alumnos"]:
-                            # Filtrar campos no relevantes
                             alumno_data = {k: v for k, v in alumno_data.items() 
                                            if k != "_id" and k != "es_objeto"}
                             alumnos_list.append(Alumno(**alumno_data))
                     
-                    # Procesar al maestro si existe
                     maestro = None
                     if "maestro" in item and isinstance(item["maestro"], dict):
                         maestro_data = {k: v for k, v in item["maestro"].items() 
                                        if k != "_id" and k != "es_objeto"}
                         maestro = Maestro(**maestro_data)
                     
-                    # Eliminar alumnos y maestro del diccionario
+
                     grupo_data = {k: v for k, v in item.items() 
                                  if k != "alumnos" and k != "maestro" and k != "_id" and k != "es_objeto"}
                     
-                    # Crear el grupo
+
                     grupo = Grupo(**grupo_data)
                     
-                    # Asignar maestro y alumnos
+
                     if maestro:
                         grupo.maestro = maestro
                     
@@ -148,7 +143,7 @@ class Grupo(Arreglo):
 if __name__ == "__main__":
     from GrupoUI import GrupoUI
 
-    # Crear una instancia de Grupo que cargará automáticamente del JSON
+ 
     grupos = Grupo()
     interfaz = GrupoUI(grupos, 'grupos.json')
     interfaz.menu()

@@ -4,12 +4,11 @@ import json
 class Maestro(Arreglo):
     def __init__(self, nombre=None, apellido=None, edad=None, matricula=None, especialidad=None):
         super().__init__()
-        self.collection_name = "maestros"  # Definir el nombre de la colección
-        self.archivo_json = "maestros.json"  # Archivo JSON por defecto
+        self.collection_name = "maestros"  
+        self.archivo_json = "maestros.json"  
         
         if nombre is None and apellido is None and edad is None and matricula is None and especialidad is None:
             self.es_objeto = True
-            # Cargar automáticamente del archivo JSON si existe
             if self.archivo_json:
                 self.cargarArchivo(self.archivo_json, Maestro)
         else:
@@ -44,30 +43,24 @@ class Maestro(Arreglo):
         if self.es_objeto:
             return iter(self.items)
         else:
-            # Si no es un contenedor, devolver un iterador que solo incluye este objeto
             return iter([self])
     
-    # Verificar si un maestro ya existe por matrícula (localmente y en MongoDB)
     def existe_maestro(self, matricula):
-        # Verificar localmente
         if self.es_objeto:
             for maestro in self.items:
                 if getattr(maestro, 'matricula', None) == matricula:
                     return True
         
-        # Verificar en MongoDB (si hay conexión)
         if self.collection_name and self.mongo_manager.is_connected:
-            # Buscar documento con la misma matrícula en MongoDB
             maestro_encontrado = self.mongo_manager.find_document(self.collection_name, {"matricula": matricula})
             if maestro_encontrado:
                 return True
         
         return False
     
-    # Sobrescribir el método agregar para evitar duplicados
+
     def agregar(self, *items):
         for item in items:
-            # Verificar si el elemento ya existe (por matrícula)
             if not self.existe_maestro(item.matricula):
                 super().agregar(item)
             else:
@@ -76,7 +69,6 @@ class Maestro(Arreglo):
 if __name__ == "__main__":
     from MaestroUI import MaestroUI
 
-    # Crear una instancia de Maestro que cargará automáticamente del JSON
     maestros = Maestro()
     interfaz = MaestroUI(maestros, 'maestros.json')
     interfaz.menu()
