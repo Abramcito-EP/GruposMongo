@@ -19,13 +19,6 @@
                 "sexo": "M"
             },
             {
-                "nombre": "Abraham",
-                "apellido": "Echavarría",
-                "edad": 19,
-                "matricula": "23170110",
-                "sexo": "M"
-            },
-            {
                 "nombre": "Axel",
                 "apellido": "Espinoza",
                 "edad": 20,
@@ -53,13 +46,6 @@
             "especialidad": "dfghj"
         },
         "alumnos": [
-            {
-                "nombre": "Abraham",
-                "apellido": "Echavarría",
-                "edad": 19,
-                "matricula": "23170110",
-                "sexo": "M"
-            },
             {
                 "nombre": "Abraham",
                 "apellido": "Echavarría",
@@ -103,5 +89,39 @@
                 "sexo": "M"
             }
         ]
+    },
+    {
+        "nombre": "GrupoH",
+        "grado": "4",
+        "seccion": "a",
+        "maestro": {
+            "nombre": "Kevin",
+            "apellido": "Gonzalez",
+            "edad": 21,
+            "matricula": "23170189",
+            "especialidad": "Programador"
+        },
+        "alumnos": [
+            {
+                "nombre": "Abraham",
+                "apellido": "Echavarría",
+                "edad": 19,
+                "matricula": "23170110",
+                "sexo": "M"
+            }
+        ]
+    },
+    {
+        "nombre": "a",
+        "grado": "3",
+        "seccion": "a",
+        "maestro": {
+            "nombre": "Kikardo",
+            "apellido": "Aguero",
+            "edad": 23,
+            "matricula": "2345678",
+            "especialidad": "Maistro"
+        },
+        "alumnos": []
     }
 ]
