@@ -5,5 +5,61 @@
         "edad": 19,
         "matricula": "23170110",
         "sexo": "M"
+    },
+    {
+        "nombre": "Abraham",
+        "apellido": "Echavarría",
+        "edad": 19,
+        "matricula": "23170110",
+        "sexo": "M"
+    },
+    {
+        "nombre": "Abraham",
+        "apellido": "Echavarría",
+        "edad": 19,
+        "matricula": "23170110",
+        "sexo": "M"
+    },
+    {
+        "nombre": "Abraham",
+        "apellido": "Echavarría",
+        "edad": 19,
+        "matricula": "23170110",
+        "sexo": "M"
+    },
+    {
+        "nombre": "Pepito",
+        "apellido": "ALcantar",
+        "edad": 15,
+        "matricula": "3453457894",
+        "sexo": "F"
+    },
+    {
+        "nombre": "Ol",
+        "apellido": "3",
+        "edad": 3,
+        "matricula": "3",
+        "sexo": "F"
+    },
+    {
+        "nombre": "Antonio",
+        "apellido": "Deras",
+        "edad": 16,
+        "matricula": "8372784748",
+        "sexo": "F"
+    },
+    {
+        "nombre": "a",
+        "apellido": "a",
+        "edad": 0,
+        "matricula": "a",
+        "sexo": "F"
+    },
+    {
+        "nombre": "q",
+        "apellido": "q",
+        "edad": 2,
+        "matricula": "q",
+        "sexo": "F"
     }
 ]

@@ -319,3 +319,14 @@ class MongoManager:
         else:
             # Implementar lógica de eliminación en archivo local
             return False
+    
+    def find_document(self, collection_name, filter_criteria):
+        """Busca un documento específico en la colección"""
+        if self.is_connected:
+            try:
+                collection = self.db[COLLECTIONS[collection_name]]
+                return collection.find_one(filter_criteria)
+            except Exception as e:
+                print(f"Error al buscar en MongoDB: {e}")
+                return None
+        return None

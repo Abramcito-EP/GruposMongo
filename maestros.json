@@ -19,5 +19,33 @@
         "edad": 20,
         "matricula": "234567",
         "especialidad": "dfghj"
+    },
+    {
+        "nombre": "Ramiro",
+        "apellido": "Duran",
+        "edad": 50,
+        "matricula": "50567867670",
+        "especialidad": "Aplicacion Web"
+    },
+    {
+        "nombre": "a",
+        "apellido": "a",
+        "edad": 3,
+        "matricula": "a",
+        "especialidad": "a"
+    },
+    {
+        "nombre": "b",
+        "apellido": "b",
+        "edad": 5,
+        "matricula": "b",
+        "especialidad": "b"
+    },
+    {
+        "nombre": "t",
+        "apellido": "t",
+        "edad": 6,
+        "matricula": "t",
+        "especialidad": "t"
     }
 ]

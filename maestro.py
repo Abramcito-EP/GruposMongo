@@ -39,6 +39,39 @@ class Maestro(Arreglo):
 
     def mostrar(self):
         print(str(self))
+        
+    def __iter__(self):
+        if self.es_objeto:
+            return iter(self.items)
+        else:
+            # Si no es un contenedor, devolver un iterador que solo incluye este objeto
+            return iter([self])
+    
+    # Verificar si un maestro ya existe por matrícula (localmente y en MongoDB)
+    def existe_maestro(self, matricula):
+        # Verificar localmente
+        if self.es_objeto:
+            for maestro in self.items:
+                if getattr(maestro, 'matricula', None) == matricula:
+                    return True
+        
+        # Verificar en MongoDB (si hay conexión)
+        if self.collection_name and self.mongo_manager.is_connected:
+            # Buscar documento con la misma matrícula en MongoDB
+            maestro_encontrado = self.mongo_manager.find_document(self.collection_name, {"matricula": matricula})
+            if maestro_encontrado:
+                return True
+        
+        return False
+    
+    # Sobrescribir el método agregar para evitar duplicados
+    def agregar(self, *items):
+        for item in items:
+            # Verificar si el elemento ya existe (por matrícula)
+            if not self.existe_maestro(item.matricula):
+                super().agregar(item)
+            else:
+                print(f"No se agregó maestro con matrícula {item.matricula} porque ya existe.")
 
 if __name__ == "__main__":
     from MaestroUI import MaestroUI

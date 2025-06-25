@@ -116,9 +116,37 @@ class Arreglo:
                 self.cargarDatos(datos, clase_objeto)
                 print(f"Datos cargados desde archivo local {archivo}")
                 
-                # Como respaldo, intentar sincronizar con MongoDB si hay conexión
-                if self.collection_name and self.mongo_manager.is_connected:
-                    self.mongo_manager.sync_all_pending_data()
+                # Verificar si hay documentos pendientes por sincronizar
+                archivo_sin_enviar = f"{archivo.split('.')[0]}_sin_enviar.json"
+                if os.path.exists(archivo_sin_enviar):
+                    try:
+                        with open(archivo_sin_enviar, "r", encoding="utf-8") as f:
+                            datos_pendientes = json.load(f)
+                        
+                        if datos_pendientes and self.collection_name and self.mongo_manager.is_connected:
+                            print(f"Sincronizando {len(datos_pendientes)} documentos pendientes...")
+                            # Sincronizar solo documentos que no existan ya en MongoDB
+                            for documento in datos_pendientes:
+                                # Extraer el identificador único (por ejemplo, matrícula)
+                                id_campo = "matricula" if "matricula" in documento else "_id"
+                                if id_campo in documento:
+                                    # Verificar si ya existe en MongoDB
+                                    filtro = {id_campo: documento[id_campo]}
+                                    if not self.mongo_manager.find_document(self.collection_name, filtro):
+                                        self.mongo_manager.insert_document(self.collection_name, documento)
+                                        print(f"Sincronizado: {documento.get(id_campo)}")
+                                    else:
+                                        print(f"Omitido (ya existe): {documento.get(id_campo)}")
+                                else:
+                                    # Si no tiene identificador, intentar insertarlo directamente
+                                    self.mongo_manager.insert_document(self.collection_name, documento)
+                            
+                            # Limpiar archivo de pendientes
+                            with open(archivo_sin_enviar, "w", encoding="utf-8") as f:
+                                json.dump([], f)
+                            print("Sincronización completada. Archivo de pendientes limpiado.")
+                    except Exception as e:
+                        print(f"Error al sincronizar pendientes: {e}")
                 
                 return True
             else:
