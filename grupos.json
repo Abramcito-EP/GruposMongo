@@ -1,127 +1,28 @@
-[
-    {
-        "nombre": "Grupo1",
-        "grado": "3",
-        "seccion": "A",
-        "maestro": {
-            "nombre": "Kikardo",
-            "apellido": "Aguero",
-            "edad": 23,
-            "matricula": "2345678",
-            "especialidad": "Maistro"
-        },
-        "alumnos": [
-            {
-                "nombre": "Abraham",
-                "apellido": "Echavarría",
-                "edad": 19,
-                "matricula": "23170110",
-                "sexo": "M"
-            },
-            {
-                "nombre": "Axel",
-                "apellido": "Espinoza",
-                "edad": 20,
-                "matricula": "23170109",
-                "sexo": "M"
-            },
-            {
-                "nombre": "Kevin",
-                "apellido": "Gonzalez",
-                "edad": 21,
-                "matricula": "23170187",
-                "sexo": "M"
-            }
-        ]
+{
+    "nombre": "Grupottote",
+    "grado": "4",
+    "seccion": "c",
+    "maestro": {
+        "nombre": "Saúl",
+        "apellido": "Sánchez",
+        "edad": 20,
+        "matricula": "234567",
+        "especialidad": "dfghj"
     },
-    {
-        "nombre": "Grupo2",
-        "grado": "5",
-        "seccion": "a",
-        "maestro": {
-            "nombre": "Saúl",
-            "apellido": "Sánchez",
+    "alumnos": [
+        {
+            "nombre": "Axel",
+            "apellido": "Joto",
             "edad": 20,
-            "matricula": "234567",
-            "especialidad": "dfghj"
+            "matricula": "123456789",
+            "sexo": "M"
         },
-        "alumnos": [
-            {
-                "nombre": "Abraham",
-                "apellido": "Echavarría",
-                "edad": 19,
-                "matricula": "23170110",
-                "sexo": "M"
-            },
-            {
-                "nombre": "Axel",
-                "apellido": "Espinoza",
-                "edad": 20,
-                "matricula": "23170109",
-                "sexo": "M"
-            },
-            {
-                "nombre": "Kevin",
-                "apellido": "Gonzalez",
-                "edad": 21,
-                "matricula": "23170187",
-                "sexo": "M"
-            }
-        ]
-    },
-    {
-        "nombre": "Grupo3",
-        "grado": "5",
-        "seccion": "A",
-        "maestro": {
-            "nombre": "Kevin",
-            "apellido": "Gonzalez",
-            "edad": 21,
-            "matricula": "23170189",
-            "especialidad": "Programador"
-        },
-        "alumnos": [
-            {
-                "nombre": "Abraham",
-                "apellido": "Echavarría",
-                "edad": 19,
-                "matricula": "23170110",
-                "sexo": "M"
-            }
-        ]
-    },
-    {
-        "nombre": "GrupoH",
-        "grado": "4",
-        "seccion": "a",
-        "maestro": {
-            "nombre": "Kevin",
-            "apellido": "Gonzalez",
-            "edad": 21,
-            "matricula": "23170189",
-            "especialidad": "Programador"
-        },
-        "alumnos": [
-            {
-                "nombre": "Abraham",
-                "apellido": "Echavarría",
-                "edad": 19,
-                "matricula": "23170110",
-                "sexo": "M"
-            }
-        ]
-    },
-    {
-        "nombre": "a",
-        "grado": "3",
-        "seccion": "a",
-        "maestro": {
-            "nombre": "Kikardo",
-            "apellido": "Aguero",
-            "edad": 23,
-            "matricula": "2345678",
-            "especialidad": "Maistro"
-        },
-        "alumnos": []
-    }
-]
+        {
+            "nombre": "Abrahahan",
+            "apellido": "Joto",
+            "edad": 20,
+            "matricula": "23456789",
+            "sexo": "M"
+        }
+    ]
+}

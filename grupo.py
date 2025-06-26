@@ -23,22 +23,22 @@ class Grupo(Arreglo):
         else:
             self.maestro = maestro
 
-
+        # Inicializar alumnos
         self.alumnos = Alumno()
         self.alumnos.es_objeto = True
         self.alumnos.items = [] 
         
-
+        # Cargar alumnos si se proporcionan
         if alumnos:
             if isinstance(alumnos, list):
                 for alumno in alumnos:
                     if isinstance(alumno, dict):
-                        self.alumnos.agregar(Alumno(**alumno))
+                        self.alumnos.items.append(Alumno(**alumno))
                     else:
-                        self.alumnos.agregar(alumno)
+                        self.alumnos.items.append(alumno)
             elif hasattr(alumnos, 'items'):
                 for alumno in alumnos.items:
-                    self.alumnos.agregar(alumno)
+                    self.alumnos.items.append(alumno)
 
         self.es_objeto = False
 
@@ -52,12 +52,21 @@ class Grupo(Arreglo):
         if self.es_objeto:
             return super().convertir_diccionario()
         
-        alumnos_dict = []
+        # Para el grupo, incluimos TODOS los datos de los alumnos
+        alumnos_completos = []
         if hasattr(self.alumnos, 'items'):
             for alumno in self.alumnos.items:
                 if hasattr(alumno, 'convertir_diccionario'):
-                    alumnos_dict.append(alumno.convertir_diccionario())
+                    # Guardar el diccionario completo del alumno
+                    alumno_dict = alumno.convertir_diccionario()
+                    # Eliminar campos que no queremos incluir
+                    if '_id' in alumno_dict:
+                        del alumno_dict['_id']
+                    if 'es_objeto' in alumno_dict:
+                        del alumno_dict['es_objeto']
+                    alumnos_completos.append(alumno_dict)
         
+        # Asegurar que el maestro tiene datos completos
         maestro_dict = {}
         if hasattr(self.maestro, 'convertir_diccionario'):
             maestro_dict = self.maestro.convertir_diccionario()
@@ -67,7 +76,7 @@ class Grupo(Arreglo):
             "grado": self.grado,
             "seccion": self.seccion,
             "maestro": maestro_dict,
-            "alumnos": alumnos_dict
+            "alumnos": alumnos_completos  # Guardar datos completos de alumnos
         }
 
     def __str__(self):
@@ -103,35 +112,37 @@ class Grupo(Arreglo):
         if isinstance(datos, list):
             for item in datos:
                 try:
-
-                    alumnos_list = []
-                    if "alumnos" in item and isinstance(item["alumnos"], list):
-                        for alumno_data in item["alumnos"]:
-                            alumno_data = {k: v for k, v in alumno_data.items() 
-                                           if k != "_id" and k != "es_objeto"}
-                            alumnos_list.append(Alumno(**alumno_data))
-                    
+                    # Procesar al maestro si existe
                     maestro = None
                     if "maestro" in item and isinstance(item["maestro"], dict):
-                        maestro_data = {k: v for k, v in item["maestro"].items() 
-                                       if k != "_id" and k != "es_objeto"}
+                        maestro_data = item["maestro"]
+                        maestro_data = {k: v for k, v in maestro_data.items() 
+                                      if k != "_id" and k != "es_objeto"}
                         maestro = Maestro(**maestro_data)
                     
-
+                    # Crear el grupo
                     grupo_data = {k: v for k, v in item.items() 
                                  if k != "alumnos" and k != "maestro" and k != "_id" and k != "es_objeto"}
-                    
-
                     grupo = Grupo(**grupo_data)
                     
-
+                    # Asignar maestro
                     if maestro:
                         grupo.maestro = maestro
                     
+                    # Procesar alumnos con sus datos completos
                     grupo.alumnos = Alumno()
+                    grupo.alumnos.es_objeto = True
                     grupo.alumnos.items = []
-                    for alumno in alumnos_list:
-                        grupo.alumnos.agregar(alumno)
+                    
+                    if "alumnos" in item and isinstance(item["alumnos"], list):
+                        for alumno_data in item["alumnos"]:
+                            if isinstance(alumno_data, dict):
+                                # Filtrar campos no deseados
+                                alumno_data = {k: v for k, v in alumno_data.items() 
+                                             if k != "_id" and k != "es_objeto"}
+                                # Crear objeto Alumno con los datos completos
+                                alumno = Alumno(**alumno_data)
+                                grupo.alumnos.items.append(alumno)
                     
                     self.items.append(grupo)
                 except Exception as e:
@@ -139,6 +150,33 @@ class Grupo(Arreglo):
         else:
             super().cargarDatos(datos, clase_objeto)
 
+    def agregar_alumno(self, alumno):
+        """Agrega un alumno al grupo sin duplicarlo en MongoDB"""
+        if not hasattr(self, 'alumnos') or not isinstance(self.alumnos, Alumno):
+            self.alumnos = Alumno()
+            self.alumnos.es_objeto = True
+            self.alumnos.items = []
+        
+        # Usar el método existe_alumno de la clase Alumno si está disponible
+        if hasattr(self.alumnos, 'existe_alumno') and hasattr(alumno, 'matricula'):
+            if self.alumnos.existe_alumno(alumno.matricula):
+                print(f"El alumno con matrícula {alumno.matricula} ya está en el grupo.")
+                return False
+        else:
+            # Verificación manual si el método no está disponible
+            for a in self.alumnos.items:
+                if hasattr(a, 'matricula') and hasattr(alumno, 'matricula') and a.matricula == alumno.matricula:
+                    print(f"El alumno con matrícula {alumno.matricula} ya está en el grupo.")
+                    return False
+        
+        # Agregar directamente a la lista de items sin intentar guardar en MongoDB
+        self.alumnos.items.append(alumno)
+        
+        # Guardar el grupo actualizado
+        if self.archivo_json:
+            self.guardarArchivo(self.archivo_json)
+        
+        return True
 
 if __name__ == "__main__":
     from GrupoUI import GrupoUI
