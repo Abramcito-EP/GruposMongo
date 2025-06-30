@@ -1,28 +1,36 @@
-{
-    "nombre": "Grupottote",
-    "grado": "4",
-    "seccion": "c",
-    "maestro": {
-        "nombre": "Saúl",
-        "apellido": "Sánchez",
-        "edad": 20,
-        "matricula": "234567",
-        "especialidad": "dfghj"
-    },
-    "alumnos": [
-        {
-            "nombre": "Axel",
-            "apellido": "Joto",
-            "edad": 20,
-            "matricula": "123456789",
-            "sexo": "M"
+[
+    {
+        "nombre": "Grupo2",
+        "grado": "5",
+        "seccion": "A",
+        "maestro": {
+            "nombre": "Ochoa",
+            "apellido": "Paola",
+            "edad": 50,
+            "matricula": "3456789",
+            "especialidad": "tcybkjnkljn"
         },
-        {
-            "nombre": "Abrahahan",
-            "apellido": "Joto",
+        "alumnos": []
+    },
+    {
+        "nombre": "Matemáticas",
+        "grado": "7",
+        "seccion": "C",
+        "maestro": {
+            "nombre": "Ramiro",
+            "apellido": "Esquivel",
             "edad": 20,
-            "matricula": "23456789",
-            "sexo": "M"
-        }
-    ]
-}
+            "matricula": "4567890",
+            "especialidad": "edtygvhjhbij"
+        },
+        "alumnos": [
+            {
+                "nombre": "Abraham",
+                "apellido": "Echavarría",
+                "edad": 20,
+                "matricula": "3456789",
+                "sexo": "D"
+            }
+        ]
+    }
+]

@@ -1,30 +1,16 @@
 [
     {
-        "nombre": "Abraham",
-        "apellido": "Echavarría",
-        "edad": 19,
-        "matricula": "23170110",
-        "sexo": "M"
-    },
-    {
         "nombre": "Axel",
-        "apellido": "Y Ya",
-        "edad": 20,
-        "matricula": "23456789",
-        "sexo": "M"
-    },
-    {
-        "nombre": "El Kevin",
-        "apellido": "GlezAnc",
-        "edad": 20,
+        "apellido": "Esp",
+        "edad": 56,
         "matricula": "456789",
-        "sexo": "M"
+        "sexo": "m"
     },
     {
         "nombre": "Axel",
-        "apellido": "Joto",
+        "apellido": "Echavirria",
         "edad": 20,
-        "matricula": "123456789",
-        "sexo": "M"
+        "matricula": "34567890",
+        "sexo": "m"
     }
 ]

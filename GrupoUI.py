@@ -3,17 +3,18 @@ from maestro import Maestro
 from alumno import Alumno
 from MaestroUI import MaestroUI
 from AlumnoUI import AlumnoUI
-import json
+from conexion import conectar_mongo
 import os
+import json
 
 class GrupoUI:
     def __init__(self, grupos=None, archivo="grupos.json"):
         self.archivo = archivo
-        self.guardar = True if archivo else False
-
+        self.guardar = False
+        
         if grupos is not None and len(grupos.items) > 0:
             self.grupos = grupos
-            print("Usando clase Grupo.")
+            print("Usando clase grupo proporcionada.")
         elif archivo and os.path.exists(archivo):
             print(f"Cargando grupos desde archivo '{archivo}'.")
             self.grupos = Grupo()
@@ -22,6 +23,13 @@ class GrupoUI:
         else:
             print("No se proporcionó archivo ni objeto con datos. Creando lista vacía.")
             self.grupos = Grupo()
+        
+        # Interfaces para reutilización
+        self.interfaz_maestro = MaestroUI(Maestro(), "maestros.json")
+        self.interfaz_alumno = AlumnoUI(Alumno(), "alumnos.json")
+        
+        # Lista para datos offline
+        self.grupos_offline = Grupo()
 
     def menu(self):
         while True:
@@ -30,7 +38,8 @@ class GrupoUI:
             print("2. Agregar grupo")
             print("3. Eliminar grupo")
             print("4. Actualizar grupo")
-            print("5. Salir")
+            print("5. Sincronizar con MongoDB")
+            print("6. Volver al menú principal")
 
             opcion = input("Seleccione una opción: ")
             if opcion == "1":
@@ -42,12 +51,13 @@ class GrupoUI:
             elif opcion == "4":
                 self.actualizar_grupo()
             elif opcion == "5":
-                print("Saliendo...")
+                self.sincronizar_mongo()
+            elif opcion == "6":
                 if self.guardar:
                     self.grupos.guardarArchivo(self.archivo)
                 break
             else:
-                print("Opción no válida.")
+                print("Opción inválida.")
 
     def mostrar_grupos(self):
         if not self.grupos.items:
@@ -70,246 +80,76 @@ class GrupoUI:
                 print("Entrada inválida.")
 
     def agregar_grupo(self):
-        # Datos básicos del grupo
         nombre = input("Nombre del grupo: ")
         grado = input("Grado: ")
         seccion = input("Sección: ")
         
-        # Crear grupo vacío (sin maestro ni alumnos todavía)
-        grupo = Grupo(nombre, grado, seccion, None, [])
-        grupo.alumnos = Alumno()
-        grupo.alumnos.es_objeto = True
-        grupo.alumnos.items = []
+        # Crear grupo básico
+        grupo = Grupo(nombre, grado, seccion)
         
-        # Asignar maestro usando la interfaz de maestros
-        print("\n--- Asignación de maestro ---")
-        print("1. Seleccionar maestro existente")
-        print("2. Crear nuevo maestro")
-        opcion_maestro = input("Seleccione una opción: ")
+        # Asignar maestro usando la interfaz existente
+        print("\n--- Creando un nuevo maestro ---")
+        self.interfaz_maestro.agregar()
         
-        if opcion_maestro == "1":
-            # Cargar maestros existentes
-            maestros_sistema = Maestro()
-            maestros_sistema.cargarArchivo("maestros.json", Maestro)
-            
-            if not maestros_sistema.items:
-                print("No hay maestros registrados. Debe crear uno nuevo.")
-                opcion_maestro = "2"
-            else:
-                # Mostrar lista para selección
-                print("\n=== Maestros disponibles ===")
-                for i, m in enumerate(maestros_sistema.items):
-                    print(f"{i}. {m}")
-                    
-                try:
-                    idx = int(input("Seleccione el índice del maestro: "))
-                    if 0 <= idx < len(maestros_sistema.items):
-                        grupo.maestro = maestros_sistema.items[idx]
-                        print(f"Maestro {grupo.maestro.nombre} {grupo.maestro.apellido} asignado al grupo.")
-                    else:
-                        print("Índice inválido. Se creará un nuevo maestro.")
-                        opcion_maestro = "2"
-                except ValueError:
-                    print("Entrada inválida. Se creará un nuevo maestro.")
-                    opcion_maestro = "2"
+        if len(self.interfaz_maestro.maestros.items) > 0:
+            grupo.maestro = self.interfaz_maestro.maestros.items[-1]
+        else:
+            print("No se pudo crear el maestro.")
+            return
         
-        if opcion_maestro == "2":
-            # Usar la interfaz de maestros para crear uno nuevo
-            print("\n--- Creando nuevo maestro para el grupo ---")
-            maestro_ui = MaestroUI(Maestro(), "maestros.json")
+        # Gestionar alumnos usando la interfaz existente
+        agregar_alumnos = input("¿Deseas agregar alumnos al grupo? (s/n): ").lower()
+        if agregar_alumnos == 's':
+            # CORRECCIÓN: Crear interfaz temporal pero mantener la referencia al grupo
+            print("\n--- Gestionando alumnos del grupo ---")
+            interfaz_alumno_grupo = AlumnoUI(grupo.alumnos)  # Usar los alumnos del grupo
+            interfaz_alumno_grupo.menu()
             
-            # Guardar el modo actual
-            modo_guardar_original = maestro_ui.guardar
-            maestro_ui.guardar = True  # Forzar guardar
-            
-            # Agregar maestro con la interfaz existente
-            maestro_ui.agregar()
-            
-            # Restaurar modo original
-            maestro_ui.guardar = modo_guardar_original
-            
-            # Cargar maestros para obtener el recién creado
-            maestros_temp = Maestro()
-            maestros_temp.cargarArchivo("maestros.json", Maestro)
-            if maestros_temp.items:
-                grupo.maestro = maestros_temp.items[-1]  # El último es el recién creado
-                print(f"Maestro {grupo.maestro.nombre} {grupo.maestro.apellido} creado y asignado al grupo.")
-            else:
-                print("Error al crear maestro. El grupo se creará sin maestro asignado.")
+            # IMPORTANTE: Los alumnos ya están en grupo.alumnos después del menú
+            # No necesitas hacer nada más, la referencia se mantiene
+            print(f"Total de alumnos en el grupo: {len(grupo.alumnos.items)}")
         
-        # Agregar alumnos al grupo
-        gestionar_alumnos = input("\n¿Desea agregar alumnos al grupo? (s/n): ").lower()
-        if gestionar_alumnos == 's':
-            self.gestionar_alumnos_grupo(grupo)
-        
-        # Guardar el grupo
+        # Agregar grupo a la lista
         self.grupos.agregar(grupo)
+        
+        # Guardar en archivo si corresponde
         if self.guardar:
             self.grupos.guardarArchivo(self.archivo)
-        print(f"Grupo '{nombre}' creado exitosamente.")
-
-    def gestionar_alumnos_grupo(self, grupo):
-        """Gestiona los alumnos de un grupo utilizando la interfaz de alumnos existente"""
-        while True:
-            print("\n--- Gestión de Alumnos del Grupo ---")
-            print("1. Ver alumnos actuales del grupo")
-            print("2. Agregar alumnos existentes")
-            print("3. Crear nuevo alumno")
-            print("4. Eliminar alumno del grupo")
-            print("5. Volver al menú anterior")
-            
-            opcion = input("Seleccione una opción: ")
-            
-            if opcion == "1":
-                # Ver alumnos del grupo
-                if not grupo.alumnos.items:
-                    print("No hay alumnos en este grupo.")
-                else:
-                    print("\n=== Alumnos del Grupo ===")
-                    for i, alumno in enumerate(grupo.alumnos.items):
-                        print(f"{i}. {alumno}")
-            
-            elif opcion == "2":
-                # Agregar alumnos existentes al grupo
-                alumnos_sistema = Alumno()
-                alumnos_sistema.cargarArchivo("alumnos.json", Alumno)
-                
-                if not alumnos_sistema.items:
-                    print("No hay alumnos registrados en el sistema.")
-                    continue
-                
-                # Mostrar alumnos disponibles
-                print("\n=== Alumnos Disponibles ===")
-                for i, alumno in enumerate(alumnos_sistema.items):
-                    print(f"{i}. {alumno}")
-                
-                try:
-                    indices = input("Ingrese índices de alumnos a agregar (separados por coma): ")
-                    if indices.strip():
-                        for idx in [int(i.strip()) for i in indices.split(",")]:
-                            if 0 <= idx < len(alumnos_sistema.items):
-                                alumno = alumnos_sistema.items[idx]
-                                # Verificar si ya está en el grupo
-                                ya_existe = False
-                                for a in grupo.alumnos.items:
-                                    if a.matricula == alumno.matricula:
-                                        ya_existe = True
-                                        break
-                                
-                                if not ya_existe:
-                                    grupo.alumnos.items.append(alumno)
-                                    print(f"Alumno {alumno.nombre} agregado al grupo.")
-                                else:
-                                    print(f"Alumno {alumno.nombre} ya está en el grupo.")
-                            else:
-                                print(f"Índice {idx} fuera de rango.")
-                    
-                    if self.guardar:
-                        self.grupos.guardarArchivo(self.archivo)
-                except ValueError:
-                    print("Formato inválido. Use números separados por comas.")
-            
-            elif opcion == "3":
-                # Crear nuevo alumno usando la interfaz existente
-                print("\n--- Creando nuevo alumno para el grupo ---")
-                alumno_ui = AlumnoUI(Alumno(), "alumnos.json")
-                
-                # Guardar modo original
-                modo_guardar_original = alumno_ui.guardar
-                alumno_ui.guardar = True  # Forzar guardar
-                
-                # Usar el método existente para crear alumno
-                alumno_ui.agregar_alumno()
-                
-                # Restaurar modo
-                alumno_ui.guardar = modo_guardar_original
-                
-                # Obtener el alumno recién creado
-                alumnos_temp = Alumno()
-                alumnos_temp.cargarArchivo("alumnos.json", Alumno)
-                if alumnos_temp.items:
-                    nuevo_alumno = alumnos_temp.items[-1]  # El último es el recién creado
-                    grupo.alumnos.items.append(nuevo_alumno)
-                    print(f"Alumno {nuevo_alumno.nombre} creado y agregado al grupo.")
-                
-                if self.guardar:
-                    self.grupos.guardarArchivo(self.archivo)
-            
-            elif opcion == "4":
-                # Eliminar alumno del grupo
-                if not grupo.alumnos.items:
-                    print("No hay alumnos en este grupo.")
-                    continue
-                
-                print("\n=== Alumnos del Grupo ===")
-                for i, alumno in enumerate(grupo.alumnos.items):
-                    print(f"{i}. {alumno}")
-                
-                try:
-                    idx = int(input("Índice del alumno a eliminar: "))
-                    if 0 <= idx < len(grupo.alumnos.items):
-                        alumno = grupo.alumnos.items[idx]
-                        grupo.alumnos.items.pop(idx)
-                        print(f"Alumno {alumno.nombre} eliminado del grupo.")
-                        
-                        if self.guardar:
-                            self.grupos.guardarArchivo(self.archivo)
-                    else:
-                        print("Índice fuera de rango.")
-                except ValueError:
-                    print("Entrada inválida.")
-            
-            elif opcion == "5":
-                # Volver al menú anterior
-                return
-            
-            else:
-                print("Opción no válida.")
+        
+        # Agregar a lista offline
+        self.grupos_offline.agregar(grupo)
+        self.guardar_en_mongo_o_local(grupo)
+        
+        print(f"Grupo '{nombre}' agregado.")
 
     def eliminar_grupo(self):
-        if not self.grupos.items:
-            print("No hay grupos para eliminar.")
-            return
-            
-        # Mostrar grupos
-        print("\n=== Grupos disponibles ===")
-        for i, grupo in enumerate(self.grupos.items):
-            print(f"{i}. {grupo}")
-            
         try:
-            indice = int(input("Índice del grupo a eliminar: "))
-            if 0 <= indice < len(self.grupos.items):
-                grupo = self.grupos.items[indice]
-                confirmacion = input(f"¿Está seguro de eliminar el grupo '{grupo.nombre}'? (s/n): ").lower()
+            if not self.grupos.items:
+                print("No hay grupos para eliminar.")
+                return
                 
-                if confirmacion == 's':
-                    self.grupos.eliminar(indice=indice)
-                    print("Grupo eliminado correctamente.")
-                    
-                    if self.guardar:
-                        self.grupos.guardarArchivo(self.archivo)
+            self.mostrar_grupos()
+            indice = int(input("Índice del grupo a eliminar: "))
+            if self.grupos.eliminar(indice=indice):
+                if self.guardar:
+                    self.grupos.guardarArchivo(self.archivo)
+                print("Grupo eliminado.")
             else:
-                print("Índice fuera de rango.")
+                print("No se pudo eliminar el grupo.")
         except ValueError:
-            print("Entrada inválida.")
+            print("Índice inválido.")
 
     def actualizar_grupo(self):
-        if not self.grupos.items:
-            print("No hay grupos para actualizar.")
-            return
-            
-        # Mostrar grupos
-        print("\n=== Grupos disponibles ===")
-        for i, grupo in enumerate(self.grupos.items):
-            print(f"{i}. {grupo}")
-            
         try:
+            if not self.grupos.items:
+                print("No hay grupos para actualizar.")
+                return
+                
+            self.mostrar_grupos()
             indice = int(input("Índice del grupo a actualizar: "))
             if 0 <= indice < len(self.grupos.items):
                 grupo = self.grupos.items[indice]
-                
-                print("\n--- Actualización de Grupo ---")
-                print("Deje en blanco los campos que no desea modificar.")
+                print("Deja en blanco si no deseas cambiar un campo.")
                 
                 nombre = input(f"Nombre ({grupo.nombre}): ") or grupo.nombre
                 grado = input(f"Grado ({grupo.grado}): ") or grupo.grado
@@ -319,62 +159,112 @@ class GrupoUI:
                 grupo.grado = grado
                 grupo.seccion = seccion
                 
-                # Preguntar si desea actualizar el maestro
-                actualizar_maestro = input("¿Desea actualizar el maestro? (s/n): ").lower()
+                # Actualizar maestro usando la interfaz existente
+                actualizar_maestro = input("¿Deseas actualizar al maestro? (s/n): ").lower()
                 if actualizar_maestro == 's':
-                    print("\n--- Opciones para el maestro ---")
-                    print("1. Seleccionar otro maestro")
-                    print("2. Editar maestro actual")
-                    opcion_maestro = input("Seleccione una opción: ")
-                    
-                    if opcion_maestro == "1":
-                        # Usar el mismo código de selección de maestro de agregar_grupo
-                        maestros_sistema = Maestro()
-                        maestros_sistema.cargarArchivo("maestros.json", Maestro)
-                        
-                        if not maestros_sistema.items:
-                            print("No hay maestros registrados.")
-                        else:
-                            print("\n=== Maestros disponibles ===")
-                            for i, m in enumerate(maestros_sistema.items):
-                                print(f"{i}. {m}")
-                                
-                            try:
-                                idx = int(input("Seleccione el índice del maestro: "))
-                                if 0 <= idx < len(maestros_sistema.items):
-                                    grupo.maestro = maestros_sistema.items[idx]
-                                    print(f"Maestro {grupo.maestro.nombre} asignado al grupo.")
-                                else:
-                                    print("Índice inválido.")
-                            except ValueError:
-                                print("Entrada inválida.")
-                    
-                    elif opcion_maestro == "2" and hasattr(grupo, 'maestro') and grupo.maestro:
-                        # Editar el maestro actual usando la interfaz de maestros
-                        print("\n--- Editando maestro actual ---")
-                        maestros_temp = Maestro()
-                        maestros_temp.agregar(grupo.maestro)
-                        
-                        maestro_ui = MaestroUI(maestros_temp, "maestros.json")
-                        modo_guardar_original = maestro_ui.guardar
-                        maestro_ui.guardar = True
-                        
-                        # Editar directamente el primer (y único) maestro en la lista
-                        indice_maestro = 0
-                        maestro_ui.actualizar_maestro(indice_maestro)
-                        
-                        # Restaurar modo
-                        maestro_ui.guardar = modo_guardar_original
-                
-                # Preguntar si desea gestionar alumnos
-                gestionar_alumnos = input("¿Desea gestionar los alumnos del grupo? (s/n): ").lower()
+                    print("\n--- Actualizando maestro ---")
+                    # Crear interfaz temporal con el maestro actual
+                    maestros_temp = Maestro()
+                    maestros_temp.agregar(grupo.maestro)
+                    interfaz_maestro_temp = MaestroUI(maestros_temp)
+                    interfaz_maestro_temp.menu()
+                    # Actualizar el maestro del grupo
+                    if len(maestros_temp.items) > 0:
+                        grupo.maestro = maestros_temp.items[0]
+
+                # Gestionar alumnos usando la interfaz existente
+                gestionar_alumnos = input("¿Deseas gestionar los alumnos? (s/n): ").lower()
                 if gestionar_alumnos == 's':
-                    self.gestionar_alumnos_grupo(grupo)
+                    print("\n--- Gestionando alumnos ---")
+                    interfaz_alumno_temp = AlumnoUI(grupo.alumnos)
+                    interfaz_alumno_temp.menu()
+                    # Los alumnos ya están actualizados en grupo.alumnos
                 
                 if self.guardar:
                     self.grupos.guardarArchivo(self.archivo)
-                print("Grupo actualizado correctamente.")
+                print("Grupo actualizado.")
             else:
                 print("Índice fuera de rango.")
         except ValueError:
             print("Entrada inválida.")
+
+    def guardar_en_mongo_o_local(self, grupo):
+        try:
+            client = conectar_mongo()
+            if client:
+                db = client["Escuela"]
+                collection = db["grupos"]
+                data = grupo.convertir_diccionario()
+                result = collection.insert_one(data)
+                print(f"Documento insertado en MongoDB con ID: {result.inserted_id}")
+                # Limpiar de offline ya que se envió
+                if grupo in self.grupos_offline.items:
+                    self.grupos_offline.items.remove(grupo)
+                self.limpiar_archivo_offline()
+            else:
+                # Guardar en archivo offline
+                self.guardar_offline(grupo)
+                print("No hay conexión. Grupo guardado localmente.")
+        except Exception as e:
+            print(f"Error: {e}")
+            self.guardar_offline(grupo)
+
+    def guardar_offline(self, grupo):
+        try:
+            archivo_offline = "grupos_sin_enviar.json"
+            data = []
+            if os.path.exists(archivo_offline):
+                with open(archivo_offline, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            
+            data.append(grupo.convertir_diccionario())
+            
+            with open(archivo_offline, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
+                
+        except Exception as e:
+            print(f"Error al guardar offline: {e}")
+
+    def sincronizar_mongo(self):
+        try:
+            client = conectar_mongo()
+            if not client:
+                print("No hay conexión a MongoDB.")
+                return
+            
+            archivo_offline = "grupos_sin_enviar.json"  # Cambiado aquí
+            if not os.path.exists(archivo_offline):
+                print("No hay datos offline para sincronizar.")
+                return
+            
+            with open(archivo_offline, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            
+            if not data:
+                print("No hay datos offline para sincronizar.")
+                return
+            
+            db = client["Escuela"]
+            collection = db["grupos"]
+            
+            if len(data) == 1:
+                collection.insert_one(data[0])
+            else:
+                collection.insert_many(data)
+            
+            print(f"Se sincronizaron {len(data)} grupos con MongoDB.")
+            
+            # Limpiar archivo offline
+            with open(archivo_offline, "w", encoding="utf-8") as f:
+                json.dump([], f)
+                
+        except Exception as e:
+            print(f"Error al sincronizar: {e}")
+
+    def limpiar_archivo_offline(self):
+        try:
+            archivo_offline = "grupos_sin_enviar.json"  # Cambiado aquí
+            with open(archivo_offline, "w", encoding="utf-8") as f:
+                json.dump([], f)
+        except:
+            pass

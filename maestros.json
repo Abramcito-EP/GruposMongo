@@ -1,51 +1,23 @@
 [
     {
-        "nombre": "Kevin",
-        "apellido": "Gonzalez",
-        "edad": 21,
-        "matricula": "23170189",
-        "especialidad": "Programador"
-    },
-    {
-        "nombre": "Kikardo",
-        "apellido": "Aguero",
-        "edad": 23,
-        "matricula": "2345678",
-        "especialidad": "Maistro"
-    },
-    {
-        "nombre": "Saúl",
-        "apellido": "Sánchez",
+        "nombre": "César Abraham",
+        "apellido": "Echavarria",
         "edad": 20,
-        "matricula": "234567",
-        "especialidad": "dfghj"
+        "matricula": "3456789",
+        "especialidad": "drtgbnm,"
+    },
+    {
+        "nombre": "Ochoa",
+        "apellido": "Paola",
+        "edad": 50,
+        "matricula": "3456789",
+        "especialidad": "tcybkjnkljn"
     },
     {
         "nombre": "Ramiro",
-        "apellido": "Duran",
-        "edad": 50,
-        "matricula": "50567867670",
-        "especialidad": "Aplicacion Web"
-    },
-    {
-        "nombre": "a",
-        "apellido": "a",
-        "edad": 3,
-        "matricula": "a",
-        "especialidad": "a"
-    },
-    {
-        "nombre": "b",
-        "apellido": "b",
-        "edad": 5,
-        "matricula": "b",
-        "especialidad": "b"
-    },
-    {
-        "nombre": "t",
-        "apellido": "t",
-        "edad": 6,
-        "matricula": "t",
-        "especialidad": "t"
+        "apellido": "Esquivel",
+        "edad": 20,
+        "matricula": "4567890",
+        "especialidad": "edtygvhjhbij"
     }
 ]
