@@ -58,7 +58,6 @@ class Arreglo:
     def guardarArchivo(self, archivo):
         try:
             with open(archivo, "w", encoding="utf-8") as f:
-                # CORREGIR: Usar siempre convertir_diccionario() para serializar
                 json.dump(self.convertir_diccionario(), f, indent=4, ensure_ascii=False)
             print(f"Datos guardados en {archivo}")
             return True
@@ -89,7 +88,6 @@ class Arreglo:
         if isinstance(datos, list):
             for item in datos:
                 try:
-                    # CORREGIR: Filtrar TODOS los campos internos, incluyendo 'items'
                     item_filtrado = {k: v for k, v in item.items() 
                                    if k not in ["_id", "es_objeto", "items"]}
                     objeto = clase_objeto(**item_filtrado)
@@ -99,7 +97,6 @@ class Arreglo:
             print(f"Datos cargados correctamente: {len(self.items)} elementos")
         else:
             try:
-                # CORREGIR: También filtrar aquí
                 datos_filtrados = {k: v for k, v in datos.items() 
                                  if k not in ["_id", "es_objeto", "items"]}
                 objeto = clase_objeto(**datos_filtrados)

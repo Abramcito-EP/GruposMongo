@@ -28,7 +28,7 @@ def menu_principal():
             interfaz = GrupoUI(grupos, 'grupos.json')
             interfaz.menu()
         elif opcion == "4":
-            print("¡Hasta luego!")
+            print("¡Bai Bai!")
             break
         else:
             print("Opción inválida.")

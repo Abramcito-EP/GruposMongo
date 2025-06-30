@@ -22,13 +22,11 @@ class Alumno(Arreglo):
 
     def convertir_diccionario(self):
         if self.es_objeto:
-            # CORREGIR: Para contenedores, devolver lista procesada
             resultado = []
             for alumno in self.items:
                 if hasattr(alumno, 'convertir_diccionario'):
                     resultado.append(alumno.convertir_diccionario())
                 else:
-                    # Fallback para objetos sin el método
                     alumno_dict = {k: v for k, v in vars(alumno).items() 
                                  if not k.startswith('_') and k not in ['es_objeto', 'items']}
                     resultado.append(alumno_dict)

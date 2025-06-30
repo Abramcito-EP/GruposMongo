@@ -9,10 +9,8 @@ class AlumnoUI:
         self.guardar = False
         
         if alumnos is not None and hasattr(alumnos, 'items'):
-            # CORRECCIÓN: Si se pasa un objeto Alumno (contenedor), usarlo directamente
             self.alumnos = alumnos
             print("Usando clase alumno proporcionada.")
-            # No cargar desde archivo si ya tienes un objeto
         elif archivo and os.path.exists(archivo):
             print(f"Cargando alumnos desde archivo '{archivo}'.")
             self.alumnos = Alumno()
@@ -22,7 +20,6 @@ class AlumnoUI:
             print("No se proporcionó archivo ni objeto con datos. Creando lista vacía.")
             self.alumnos = Alumno()
         
-        # Lista para datos offline
         self.alumnos_offline = Alumno()
 
     def menu(self):
@@ -75,14 +72,11 @@ class AlumnoUI:
         
         alumno = Alumno(nombre, apellido, edad, matricula, sexo)
         
-        # CORRECCIÓN: Agregar a la lista de alumnos (que puede ser del grupo)
         self.alumnos.agregar(alumno)
         
-        # Guardar en archivo SOLO si estamos manejando el archivo principal
         if self.guardar:
             self.alumnos.guardarArchivo(self.archivo)
         
-        # Agregar a lista offline para MongoDB
         self.alumnos_offline.agregar(alumno)
         self.guardar_en_mongo_o_local(alumno)
         
@@ -147,12 +141,10 @@ class AlumnoUI:
                 data = alumno.convertir_diccionario()
                 result = collection.insert_one(data)
                 print(f"Documento insertado en MongoDB con ID: {result.inserted_id}")
-                # Limpiar de offline ya que se envió
                 if alumno in self.alumnos_offline.items:
                     self.alumnos_offline.items.remove(alumno)
                 self.limpiar_archivo_offline()
             else:
-                # Guardar en archivo offline
                 self.guardar_offline(alumno)
                 print("No hay conexión. Alumno guardado localmente.")
         except Exception as e:
@@ -182,7 +174,7 @@ class AlumnoUI:
                 print("No hay conexión a MongoDB.")
                 return
             
-            archivo_offline = "alumnos_sin_enviar.json"  # Cambiado aquí
+            archivo_offline = "alumnos_sin_enviar.json"
             if not os.path.exists(archivo_offline):
                 print("No hay datos offline para sincronizar.")
                 return
@@ -204,7 +196,6 @@ class AlumnoUI:
             
             print(f"Se sincronizaron {len(data)} alumnos con MongoDB.")
             
-            # Limpiar archivo offline
             with open(archivo_offline, "w", encoding="utf-8") as f:
                 json.dump([], f)
                 

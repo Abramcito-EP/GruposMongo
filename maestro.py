@@ -22,7 +22,6 @@ class Maestro(Arreglo):
 
     def convertir_diccionario(self):
         if self.es_objeto:
-            # CORREGIR: Para contenedores, devolver lista procesada
             resultado = []
             for maestro in self.items:
                 if hasattr(maestro, 'convertir_diccionario'):
