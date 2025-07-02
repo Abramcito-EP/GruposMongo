@@ -1,6 +1,4 @@
 import json
-import os
-
 class Arreglo:
     def __init__(self):
         self.items = []
@@ -30,13 +28,13 @@ class Arreglo:
     
     def __str__(self):
         if not self.items:
-            return "0"
-        return str(len(self.items))
+            return "[]"
+        return f"Elementos: {len(self.items)}"
 
     def convertir_diccionario(self):
         def limpiar(dic):
             return {k: v for k, v in dic.items() if k != "_id"}
-        
+
         if self.es_objeto:
             return [limpiar(vars(item)) for item in self.items]
         else:
@@ -53,55 +51,43 @@ class Arreglo:
         else:
             for atributo, valor in vars(self).items():
                 if not atributo.startswith("__") and atributo != "es_objeto" and atributo != "items":
-                    print(f"{atributo}: {valor}")
+                    if hasattr(valor, "__str__"):
+                        print(f"{atributo}: {valor}")
+                    else:
+                        print(f"{atributo}: {valor}")
     
     def guardarArchivo(self, archivo):
         try:
             with open(archivo, "w", encoding="utf-8") as f:
                 json.dump(self.convertir_diccionario(), f, indent=4, ensure_ascii=False)
             print(f"Datos guardados en {archivo}")
-            return True
         except Exception as e:
             print(f"Error al guardar en archivo: {e}")
-            return False
 
     def cargarArchivo(self, archivo, clase_objeto):
         try:
-            if os.path.exists(archivo):
-                with open(archivo, "r", encoding="utf-8") as f:
-                    datos = json.load(f)
-                self.cargarDatos(datos, clase_objeto)
-                print(f"Datos cargados desde archivo local {archivo}")
-                return True
-            else:
-                print(f"No se encontró el archivo {archivo}")
-                with open(archivo, "w", encoding="utf-8") as f:
-                    json.dump([], f)
-                print(f"Se creó un archivo vacío: {archivo}")
-                return False
+            with open(archivo, "r", encoding="utf-8") as f:
+                datos = json.load(f)
+            self.cargarDatos(datos, clase_objeto)
+        except FileNotFoundError:
+            print(f"Error: El archivo {archivo} no existe")
+        except TypeError as e:
+            print(f"Error: La clase {clase_objeto.__name__} no es compatible con los datos del archivo: {e}")
         except Exception as e:
-            print(f"Error al cargar datos: {e}")
-            return False
+            print(f"Error al cargar desde archivo: {e}")
 
     def cargarDatos(self, datos, clase_objeto):
         self.items = []
+
         if isinstance(datos, list):
             for item in datos:
-                try:
-                    item_filtrado = {k: v for k, v in item.items() 
-                                   if k not in ["_id", "es_objeto", "items"]}
-                    objeto = clase_objeto(**item_filtrado)
-                    self.items.append(objeto)
-                except Exception as e:
-                    print(f"Error al cargar item: {e}")
-            print(f"Datos cargados correctamente: {len(self.items)} elementos")
-        else:
-            try:
-                datos_filtrados = {k: v for k, v in datos.items() 
-                                 if k not in ["_id", "es_objeto", "items"]}
-                objeto = clase_objeto(**datos_filtrados)
+                item = {k: v for k, v in item.items() if k != "es_objeto"}
+                objeto = clase_objeto(**item)
                 self.items.append(objeto)
-                print("Dato cargado correctamente desde un solo objeto")
-            except Exception as e:
-                print(f"Error al cargar objeto único: {e}")
+            print("Datos cargados correctamente desde lista")
+        else:
+            datos = {k: v for k, v in datos.items() if k != "es_objeto"}
+            objeto = clase_objeto(**datos)
+            self.items.append(objeto)
+            print("Dato cargado correctamente desde un solo objeto")
 
